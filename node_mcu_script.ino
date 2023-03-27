@@ -87,7 +87,7 @@ BLYNK_CONNECTED() {
 }
 
 int cmMsec, inMsec;
-float aux_cmMsec, tempC, tempC_old=1, tempC_old_02, change_tmpC_perc;
+float aux_cmMsec, tempC, tempC_old=1, tempC_old_02, change_tmpC_perc, preview_tmp_1hr;
 
 void myTimerEvent()
   {
@@ -178,7 +178,8 @@ void changePerc()
 
   tempC_old_02 = tempC_old; // Aux variable to keep the previous temp
 
-  change_tmpC_perc = tempC/tempC_old-1;
+  change_tmpC_perc = 100*(tempC/tempC_old-1); //Percentage of change acoording to previous temp
+  preview_tmp_1hr = tempC+((tempC/tempC_old)*60); //Expected temp after 1 hour
   tempC_old = tempC;
   if( change_tmpC_perc < 0 )
   {
@@ -197,6 +198,7 @@ void changePerc()
   Blynk.virtualWrite(V6, change_tmpC_perc); //Percentage of the difference
   Blynk.virtualWrite(V7, tempC_old_02); //recorded temp. The reason why is here is to display the previous temp
   Blynk.virtualWrite(V8, tempC); //Current tmp
+  Blynk.virtualWrite(V11, preview_tmp_1hr); 
 
   Serial.println("");
   Serial.println("");
@@ -241,7 +243,7 @@ void setup()
   timer.setInterval(5000L, myTimerEvent);
 
   // Display changing Percentage
-  timer.setInterval(600000L, changePerc); //5 min Interval
+  timer.setInterval(60000L, changePerc); //5 min Interval
   
 }
 
